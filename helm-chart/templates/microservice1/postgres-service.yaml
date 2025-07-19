@@ -1,0 +1,20 @@
+{{- if and .Values.microservice1.enabled .Values.microservice1.postgres.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service1
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "k8s-helm-tilt-service.labels" . | nindent 4 }}
+    app.kubernetes.io/component: microservice1-postgres
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.microservice1.postgres.service.port }}
+    targetPort: {{ .Values.microservice1.postgres.service.port }}
+    protocol: TCP
+    name: postgres
+  selector:
+    app.kubernetes.io/name: microservice1-postgres
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

@@ -1,0 +1,15 @@
+{{- if .Values.microservice2.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: microservice2-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "k8s-helm-tilt-service.labels" . | nindent 4 }}
+    app.kubernetes.io/component: microservice2-config
+data:
+  database-name: {{ .Values.microservice2.postgres.auth.database }}
+  database-user: {{ .Values.microservice2.postgres.auth.username }}
+  service-name: "microservice2"
+  service-port: "{{ .Values.microservice2.webApp.service.targetPort }}"
+{{- end }}

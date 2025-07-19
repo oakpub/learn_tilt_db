@@ -1,0 +1,15 @@
+{{- if .Values.microservice1.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: microservice1-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "k8s-helm-tilt-service.labels" . | nindent 4 }}
+    app.kubernetes.io/component: microservice1-config
+data:
+  database-name: {{ .Values.microservice1.postgres.auth.database }}
+  database-user: {{ .Values.microservice1.postgres.auth.username }}
+  service-name: "microservice1"
+  service-port: "{{ .Values.microservice1.webApp.service.targetPort }}"
+{{- end }}

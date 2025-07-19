@@ -1,0 +1,19 @@
+{{- if and .Values.microservice2.enabled .Values.microservice2.postgres.enabled .Values.microservice2.postgres.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: microservice2-postgres-pvc
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "k8s-helm-tilt-service.labels" . | nindent 4 }}
+    app.kubernetes.io/component: microservice2-postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.microservice2.postgres.persistence.size }}
+  {{- if .Values.microservice2.postgres.persistence.storageClass }}
+  storageClassName: {{ .Values.microservice2.postgres.persistence.storageClass }}
+  {{- end }}
+{{- end }}

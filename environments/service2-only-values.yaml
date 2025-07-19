@@ -1,0 +1,93 @@
+# Service 2 only configuration
+# Only microservice2 with its database
+
+global:
+  namespace: default
+  labels:
+    app.kubernetes.io/name: k8s-helm-tilt-service
+    app.kubernetes.io/version: "1.0.0"
+    environment: service2-only
+
+microservice1:
+  enabled: false  # Microservice 1 is disabled
+  webApp:
+    image:
+      repository: microservice1
+      tag: latest
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 80
+      targetPort: 5001
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  postgres:
+    enabled: false  # PostgreSQL for service 1 is also disabled
+    image:
+      repository: postgres
+      tag: "15"
+    service:
+      port: 5432
+    persistence:
+      enabled: true
+      size: 1Gi
+      storageClass: ""
+    auth:
+      database: service1_db
+      username: service1_user
+      password: service1_password
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+microservice2:
+  enabled: true
+  webApp:
+    image:
+      repository: microservice2
+      tag: latest
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 80
+      targetPort: 5002
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  postgres:
+    enabled: true
+    image:
+      repository: postgres
+      tag: "15"
+    service:
+      port: 5432
+    persistence:
+      enabled: true
+      size: 1Gi
+      storageClass: ""
+    auth:
+      database: service2_db
+      username: service2_user
+      password: service2_password
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi

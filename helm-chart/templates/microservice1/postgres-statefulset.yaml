@@ -1,0 +1,82 @@
+{{- if and .Values.microservice1.enabled .Values.microservice1.postgres.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: microservice1-postgres
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "k8s-helm-tilt-service.labels" . | nindent 4 }}
+    app.kubernetes.io/component: microservice1-postgres
+spec:
+  serviceName: postgres-service1
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: microservice1-postgres
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: microservice1-postgres
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: microservice1-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: "{{ .Values.microservice1.postgres.image.repository }}:{{ .Values.microservice1.postgres.image.tag }}"
+        ports:
+        - name: postgres
+          containerPort: {{ .Values.microservice1.postgres.service.port }}
+          protocol: TCP
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: microservice1-config
+              key: database-name
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: microservice1-config
+              key: database-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: microservice1-secret
+              key: database-password
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - exec pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1 -p 5432
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - exec pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1 -p 5432
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          {{- toYaml .Values.microservice1.postgres.resources | nindent 10 }}
+      volumes:
+      - name: postgres-storage
+        {{- if .Values.microservice1.postgres.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: microservice1-postgres-pvc
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+{{- end }}

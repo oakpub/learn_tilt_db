@@ -1,0 +1,70 @@
+{{- if .Values.microservice2.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice2-web
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "k8s-helm-tilt-service.labels" . | nindent 4 }}
+    app.kubernetes.io/component: microservice2-web
+spec:
+  replicas: {{ .Values.microservice2.webApp.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: microservice2-web
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: microservice2-web
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: microservice2-web
+    spec:
+      containers:
+      - name: microservice2
+        image: "{{ .Values.microservice2.webApp.image.repository }}:{{ .Values.microservice2.webApp.image.tag }}"
+        imagePullPolicy: {{ .Values.microservice2.webApp.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.microservice2.webApp.service.targetPort }}
+          protocol: TCP
+        env:
+        - name: DB_HOST
+          value: "postgres-service2"
+        - name: DB_PORT
+          value: "{{ .Values.microservice2.postgres.service.port }}"
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: microservice2-config
+              key: database-name
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: microservice2-config
+              key: database-user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: microservice2-secret
+              key: database-password
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          {{- toYaml .Values.microservice2.webApp.resources | nindent 10 }}
+      restartPolicy: Always
+{{- end }}

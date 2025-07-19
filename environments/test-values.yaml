@@ -1,0 +1,93 @@
+# Test environment configuration
+# Both microservices without persistent storage (using emptyDir)
+
+global:
+  namespace: default
+  labels:
+    app.kubernetes.io/name: k8s-helm-tilt-service
+    app.kubernetes.io/version: "1.0.0"
+    environment: test
+
+microservice1:
+  enabled: true
+  webApp:
+    image:
+      repository: microservice1
+      tag: latest
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 80
+      targetPort: 5001
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m   # Lower resources for testing
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  postgres:
+    enabled: true
+    image:
+      repository: postgres
+      tag: "15"
+    service:
+      port: 5432
+    persistence:
+      enabled: false  # No persistent storage - data will be lost on restart
+      size: 1Gi
+      storageClass: ""
+    auth:
+      database: service1_db
+      username: service1_user
+      password: service1_test_password
+    resources:
+      requests:
+        cpu: 50m   # Lower resources for testing
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 512Mi
+
+microservice2:
+  enabled: true
+  webApp:
+    image:
+      repository: microservice2
+      tag: latest
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 80
+      targetPort: 5002
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m   # Lower resources for testing
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  postgres:
+    enabled: true
+    image:
+      repository: postgres
+      tag: "15"
+    service:
+      port: 5432
+    persistence:
+      enabled: false  # No persistent storage - data will be lost on restart
+      size: 1Gi
+      storageClass: ""
+    auth:
+      database: service2_db
+      username: service2_user
+      password: service2_test_password
+    resources:
+      requests:
+        cpu: 50m   # Lower resources for testing
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 512Mi

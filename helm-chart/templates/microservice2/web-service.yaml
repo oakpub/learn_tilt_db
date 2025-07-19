@@ -1,0 +1,20 @@
+{{- if .Values.microservice2.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservice2-web
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "k8s-helm-tilt-service.labels" . | nindent 4 }}
+    app.kubernetes.io/component: microservice2-web
+spec:
+  type: {{ .Values.microservice2.webApp.service.type }}
+  ports:
+  - port: {{ .Values.microservice2.webApp.service.port }}
+    targetPort: {{ .Values.microservice2.webApp.service.targetPort }}
+    protocol: TCP
+    name: http
+  selector:
+    app.kubernetes.io/name: microservice2-web
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
