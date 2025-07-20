@@ -8,33 +8,33 @@ environment = cfg.get("environment", "dev")
 # Determine values file based on environment
 values_file = "./environments/{}-values.yaml".format(environment)
 if not os.path.exists(values_file):
-    values_file = "./helm-chart/values.yaml"
+    values_file = "./helm/values.yaml"
 
 print("Using values file: {}".format(values_file))
 
 # Build Docker images for microservices with live reload
 docker_build(
     'microservice1', 
-    './docker/microservice1',
-    dockerfile='./docker/microservice1/Dockerfile',
+    './services/microservice1',
+    dockerfile='./services/microservice1/Dockerfile',
     live_update=[
-        sync('./docker/microservice1/src', '/app'),
-        run('pip install -r requirements.txt', trigger=['./docker/microservice1/requirements.txt'])
+        sync('./services/microservice1/src', '/app'),
+        run('pip install -r requirements.txt', trigger=['./services/microservice1/requirements.txt'])
     ]
 )
 
 docker_build(
     'microservice2', 
-    './docker/microservice2',
-    dockerfile='./docker/microservice2/Dockerfile',
+    './services/microservice2',
+    dockerfile='./services/microservice2/Dockerfile',
     live_update=[
-        sync('./docker/microservice2/src', '/app'),
-        run('pip install -r requirements.txt', trigger=['./docker/microservice2/requirements.txt'])
+        sync('./services/microservice2/src', '/app'),
+        run('pip install -r requirements.txt', trigger=['./services/microservice2/requirements.txt'])
     ]
 )
 
 # Deploy using Helm with selected environment
-k8s_yaml(helm('./helm-chart', values=[values_file]))
+k8s_yaml(helm('./helm', values=[values_file]))
 
 # Port forwards for local development
 k8s_resource('microservice1-web', port_forwards='8001:80')
@@ -84,14 +84,14 @@ k8s_resource(
 # Local resource for running tests
 local_resource(
     'helm-lint',
-    'helm lint ./helm-chart',
-    deps=['./helm-chart'],
+    'helm lint ./helm',
+    deps=['./helm'],
     labels=['validation']
 )
 
 # Watch for changes in values files
 watch_file(values_file)
-watch_file('./helm-chart/values.yaml')
+watch_file('./helm/values.yaml')
 
 print("Tilt is configured for environment: {}".format(environment))
 print("Access microservice1 at: http://localhost:8001")

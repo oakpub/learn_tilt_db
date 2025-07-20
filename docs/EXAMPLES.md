@@ -13,7 +13,7 @@
 tilt up -- --environment=dev
 
 # Или с Helm
-helm install dev-release ./helm-chart -f ./environments/dev-values.yaml
+helm install dev-release ./helm -f ./environments/dev-values.yaml
 ```
 
 **Результат**:
@@ -31,7 +31,7 @@ helm install dev-release ./helm-chart -f ./environments/dev-values.yaml
 tilt up -- --environment=test
 
 # Или с Helm
-helm install test-release ./helm-chart -f ./environments/test-values.yaml
+helm install test-release ./helm -f ./environments/test-values.yaml
 ```
 
 **Результат**:
@@ -48,7 +48,7 @@ helm install test-release ./helm-chart -f ./environments/test-values.yaml
 tilt up -- --environment=service1-only
 
 # Или с Helm
-helm install service1-release ./helm-chart -f ./environments/service1-only-values.yaml
+helm install service1-release ./helm -f ./environments/service1-only-values.yaml
 ```
 
 **Результат**:
@@ -65,7 +65,7 @@ helm install service1-release ./helm-chart -f ./environments/service1-only-value
 tilt up -- --environment=service2-only
 
 # Или с Helm
-helm install service2-release ./helm-chart -f ./environments/service2-only-values.yaml
+helm install service2-release ./helm -f ./environments/service2-only-values.yaml
 ```
 
 **Результат**:
@@ -222,24 +222,24 @@ microservice2:
 Использование:
 
 ```bash
-helm install custom-release ./helm-chart -f ./environments/my-custom-values.yaml
+helm install custom-release ./helm -f ./environments/my-custom-values.yaml
 ```
 
 ### Переопределение отдельных параметров
 
 ```bash
 # Изменение количества реплик
-helm install my-release ./helm-chart \
+helm install my-release ./helm \
   --set microservice1.webApp.replicas=3 \
   --set microservice2.webApp.replicas=2
 
 # Отключение персистентного хранилища
-helm install my-release ./helm-chart \
+helm install my-release ./helm \
   --set microservice1.postgres.persistence.enabled=false \
   --set microservice2.postgres.persistence.enabled=false
 
 # Изменение размера хранилища
-helm install my-release ./helm-chart \
+helm install my-release ./helm \
   --set microservice1.postgres.persistence.size=10Gi
 ```
 
@@ -270,11 +270,11 @@ jobs:
     
     - name: Run Helm tests
       run: |
-        ./helm-chart/tests/template-tests.sh
+        ./helm/tests/template-tests.sh
     
     - name: Deploy to staging
       run: |
-        helm upgrade --install staging-release ./helm-chart \
+        helm upgrade --install staging-release ./helm \
           -f ./environments/test-values.yaml \
           --namespace staging \
           --create-namespace
@@ -283,7 +283,7 @@ jobs:
       run: |
         export NAMESPACE=staging
         export RELEASE_NAME=staging-release
-        ./helm-chart/tests/integration-tests.sh
+        ./helm/tests/integration-tests.sh
 ```
 
 ### GitLab CI пример
@@ -296,12 +296,12 @@ stages:
 helm-test:
   stage: test
   script:
-    - ./helm-chart/tests/template-tests.sh
+    - ./helm/tests/template-tests.sh
 
 deploy-staging:
   stage: deploy
   script:
-    - helm upgrade --install staging-release ./helm-chart 
+    - helm upgrade --install staging-release ./helm 
         -f ./environments/test-values.yaml
         --namespace staging
         --create-namespace
@@ -313,7 +313,7 @@ integration-test:
   script:
     - export NAMESPACE=staging
     - export RELEASE_NAME=staging-release
-    - ./helm-chart/tests/integration-tests.sh
+    - ./helm/tests/integration-tests.sh
   needs:
     - deploy-staging
 ```
@@ -369,7 +369,7 @@ microservice2:
 kubectl create namespace production
 
 # Развертывание
-helm install prod-release ./helm-chart \
+helm install prod-release ./helm \
   -f ./environments/prod-values.yaml \
   --namespace production
 
@@ -428,7 +428,7 @@ kubectl scale deployment microservice1-web --replicas=5
 kubectl scale deployment microservice2-web --replicas=3
 
 # Или через Helm
-helm upgrade prod-release ./helm-chart \
+helm upgrade prod-release ./helm \
   -f ./environments/prod-values.yaml \
   --set microservice1.webApp.replicas=5 \
   --set microservice2.webApp.replicas=3 \

@@ -135,7 +135,7 @@ microservice2:
 ```
 k8s-helm-tilt-service/
 ├── Tiltfile                    # Конфигурация Tilt
-├── docker/
+├── services/
 │   ├── microservice1/
 │   │   ├── Dockerfile
 │   │   └── src/
@@ -144,7 +144,7 @@ k8s-helm-tilt-service/
 │       ├── Dockerfile
 │       └── src/
 │           └── app.py          # Веб-приложение микросервиса 2
-├── helm-chart/
+├── helm/
 │   ├── Chart.yaml
 │   ├── values.yaml
 │   └── templates/

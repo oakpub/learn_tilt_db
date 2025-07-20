@@ -81,29 +81,29 @@ tilt down
 ### Установка с профилем по умолчанию
 
 ```bash
-helm install my-release ./helm-chart
+helm install my-release ./helm
 ```
 
 ### Установка с конкретным профилем
 
 ```bash
 # Полная разработческая среда
-helm install my-release ./helm-chart -f ./environments/dev-values.yaml
+helm install my-release ./helm -f ./environments/dev-values.yaml
 
 # Только первый микросервис
-helm install my-release ./helm-chart -f ./environments/service1-only-values.yaml
+helm install my-release ./helm -f ./environments/service1-only-values.yaml
 
 # Только второй микросервис
-helm install my-release ./helm-chart -f ./environments/service2-only-values.yaml
+helm install my-release ./helm -f ./environments/service2-only-values.yaml
 
 # Тестовая среда без персистентного хранилища
-helm install my-release ./helm-chart -f ./environments/test-values.yaml
+helm install my-release ./helm -f ./environments/test-values.yaml
 ```
 
 ### Обновление
 
 ```bash
-helm upgrade my-release ./helm-chart -f ./environments/dev-values.yaml
+helm upgrade my-release ./helm -f ./environments/dev-values.yaml
 ```
 
 ### Удаление
@@ -204,14 +204,14 @@ microservice2:
 ### Тесты Helm templates
 
 ```bash
-./helm-chart/tests/template-tests.sh
+./helm/tests/template-tests.sh
 ```
 
 ### Интеграционные тесты
 
 ```bash
 # После развертывания в кластере
-./helm-chart/tests/integration-tests.sh
+./helm/tests/integration-tests.sh
 ```
 
 ### Ручное тестирование
@@ -322,10 +322,10 @@ kubectl describe pods
 ```
 k8s-helm-tilt-service/
 ├── Tiltfile                    # Конфигурация Tilt
-├── docker/
+├── services/
 │   ├── microservice1/         # Первый микросервис
 │   └── microservice2/         # Второй микросервис
-├── helm-chart/                # Helm chart
+├── helm/                      # Helm chart
 │   ├── Chart.yaml
 │   ├── values.yaml
 │   └── templates/
@@ -336,15 +336,15 @@ k8s-helm-tilt-service/
 
 ### Добавление нового микросервиса
 
-1. Создайте директорию в `docker/`
-2. Добавьте конфигурацию в `helm-chart/values.yaml`
-3. Создайте templates в `helm-chart/templates/`
+1. Создайте директорию в `services/`
+2. Добавьте конфигурацию в `helm/values.yaml`
+3. Создайте templates в `helm/templates/`
 4. Обновите `Tiltfile`
 5. Добавьте тесты
 
 ### Изменение конфигурации
 
-1. Отредактируйте `helm-chart/values.yaml` или файлы в `environments/`
+1. Отредактируйте `helm/values.yaml` или файлы в `environments/`
 2. При использовании Tilt изменения применятся автоматически
 3. При использовании Helm выполните `helm upgrade`
 

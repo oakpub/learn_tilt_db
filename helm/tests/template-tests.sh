@@ -4,8 +4,8 @@
 
 set -e
 
-CHART_DIR="./helm-chart"
-TEST_DIR="./helm-chart/tests"
+CHART_DIR="./helm"
+TEST_DIR="./helm/tests"
 
 echo "Running Helm template tests..."
 
