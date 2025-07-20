@@ -41,45 +41,10 @@ k8s_resource('microservice1-web', port_forwards='8001:80')
 k8s_resource('microservice2-web', port_forwards='8002:80')
 
 # Resource grouping for better UI organization
-k8s_resource(
-    workload='microservice1-web',
-    objects=[
-        'microservice1-web:service', 
-        'microservice1-config:configmap', 
-        'microservice1-secret:secret'
-    ],
-    resource_deps=['microservice1-postgres'],
-    labels=['microservice1']
-)
-
-k8s_resource(
-    workload='microservice2-web', 
-    objects=[
-        'microservice2-web:service', 
-        'microservice2-config:configmap', 
-        'microservice2-secret:secret'
-    ],
-    resource_deps=['microservice2-postgres'],
-    labels=['microservice2']
-)
-
-k8s_resource(
-    workload='microservice1-postgres',
-    objects=[
-        'microservice1-postgres:service', 
-        'microservice1-postgres-pvc:persistentvolumeclaim'
-    ],
-    labels=['microservice1', 'database']
-)
-
-k8s_resource(
-    workload='microservice2-postgres',
-    objects=[
-        'microservice2-postgres:service', 
-        'microservice2-postgres-pvc:persistentvolumeclaim'
-    ],
-    labels=['microservice2', 'database']
-)
+k8s_resource('microservice1-web', labels=['microservice1'])
+k8s_resource('microservice2-web', labels=['microservice2'])
+k8s_resource('microservice1-postgres', labels=['microservice1', 'database'])
+k8s_resource('microservice2-postgres', labels=['microservice2', 'database'])
 
 # Local resource for running tests
 local_resource(
